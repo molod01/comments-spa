@@ -10,3 +10,16 @@ code {
 	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
+.general-comment {
+	background-color: #e2e2e2;
+}
+.reply-comment {
+	background-color: #ededed;
+}
+.mail {
+	height: 18px;
+	font-size: 11px;
+}
+.reply {
+	cursor: pointer;
+}
