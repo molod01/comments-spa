@@ -1,9 +1,7 @@
+import bodyParser from 'body-parser';
 import express from 'express';
-import { DataTypes, Model, Sequelize } from 'sequelize';
 import { WebSocketServer } from 'ws';
-import dbConfig from './config/db.config.js';
-import CommentModel from './models/Comment.js';
-import UserModel from './models/User.js';
+import db from './db/database.js';
 import router from './routes/routes.js';
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -15,10 +13,14 @@ wss.on('connection', (ws) => {
 });
 
 app.set('port', PORT);
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 app.use('/api', router);
-app.use('*', (req, res) => {
-	res.status(404).json({ message: 'Page not found' });
-});
+
+// app.use('*', (req, res) => {
+// 	res.status(404).json({ message: 'Page not found' });
+// });
 
 const server = app.listen(PORT, console.log(`http://localhost:${PORT}`));
 server.on('upgrade', (req, socket, head) => {
@@ -27,21 +29,6 @@ server.on('upgrade', (req, socket, head) => {
 	});
 });
 
-const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
-	host: dbConfig.HOST,
-	dialect: dbConfig.dialect,
-	pool: dbConfig.pool,
+server.on('close', () => {
+	db.close();
 });
-
-sequelize
-	.authenticate()
-	.then(() => console.log('Connection has been established successfully.'))
-	.then(() => {
-		// const User = UserModel(sequelize);
-		// const Comment = CommentModel(sequelize);
-		// User.hasMany(Comment);
-		// Comment.belongsTo(User);
-		// Comment.hasMany(Comment);
-		sequelize.sync();
-	})
-	.catch((err) => console.error('Unable to connect to the database:', error));

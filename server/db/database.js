@@ -1,7 +1,7 @@
-import { DataTypes, Model, Sequelize } from 'sequelize';
+import Sequelize from 'sequelize';
+import dbConfig from '../config/db.config.js';
 import CommentModel from '../models/Comment.js';
 import UserModel from '../models/User.js';
-import dbConfig from '../config/db.config.js';
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 	host: dbConfig.HOST,
@@ -11,8 +11,8 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 
 sequelize
 	.authenticate()
-	.then(() => console.log('Connection has been established successfully.'))
 	.then(() => {
+		console.log('Connection has been established successfully.');
 		const User = UserModel(sequelize);
 		const Comment = CommentModel(sequelize);
 		User.hasMany(Comment);
