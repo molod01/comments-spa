@@ -1,62 +1,71 @@
+import fs from 'fs';
+import { where } from 'sequelize';
 import db from '../db/database.js';
-import CommentModel from '../models/Comment.js';
 
-const Comment = CommentModel(db);
+const User = db.users;
+const Comment = db.comments;
 
-export const readAll = async (req, res, next) => {
-	await Comment.findAll()
-		.then((Comments) => {
-			req.Comments = Comments;
-			next();
-		})
+const saveFile = (name, data) => {
+	fs.writeFile('files/' + name, data, (err) => {
+		if (err) {
+			return console.log(err);
+		}
+		console.log('The file was saved!');
+	});
+};
+
+export const readAll = async () => {
+	// return await Comment.findAll({ include: ['user', 'replies'] })
+	return await Comment.findAll({ include: [{ all: true, nested: true, include: [{ all: true, nested: true, include: [{ all: true, nested: true }] }] }] })
+		.then((comments) => comments)
 		.catch((err) => {
 			console.log(`Comments's get error: ${err}`);
-			return res.sendStatus(500);
 		});
 };
 
-export const create = async (req, res, next) => {
-	console.log(req.body);
-	await Comment.create(req.body)
-		.then(() => next())
-		.catch((err) => {
-			console.log(`Comment create error: ${err}`);
-			return res.sendStatus(500);
-		});
+export const create = async (payload) => {
+	const [user, created] = await User.findOrCreate({
+		where: { ...payload.user },
+	});
+
+	let comment = {
+		text: payload.comment_text,
+		homepage: payload.homepage,
+		UserId: user.id,
+		replyTo: payload.reply_to,
+	};
+	if (payload.file) {
+		saveFile(payload.file.name, payload.file.body);
+		comment.file_link = payload.file.name;
+	}
+	// console.log('New Comment: ', comment);
+	await Comment.create(comment).catch((err) => {
+		console.log(`Comment create error: ${err}`);
+	});
 };
 
-export const readById = async (req, res, next) => {
-	const id = req.params.id;
-	await Comment.findByPk(id)
-		.then((result) => {
-			req.auto = result;
-			next();
-		})
+export const readById = async (id) => {
+	return Comment.findByPk(id)
+		.then((result) => result)
 		.catch((err) => {
 			console.log(`Comment get error: ${err}`);
-			return res.sendStatus(500);
 		});
 };
 
-export const deleteById = async (req, res, next) => {
-	const id = req.params.id;
+export const deleteById = async (id) => {
 	await Comment.destroy({
 		where: {
 			id: id,
 		},
-	})
-		.then(next())
-		.catch((err) => {
-			console.log(`Comment delete error: ${err}`);
-			return res.sendStatus(500);
-		});
+	}).catch((err) => {
+		console.log(`Comment delete error: ${err}`);
+	});
 };
 
-export const getCount = async (req, res, next) => {
-	await Comment.count()
-		.then(next())
-		.catch((err) => {
-			console.log(`Comment get count error: ${err}`);
-			return res.sendStatus(500);
-		});
+export const getCount = async () => {
+	return Comment.count().catch((err) => {
+		console.log(`Comment get count error: ${err}`);
+	});
 };
+
+export default { create, readAll, readById, deleteById, getCount };

@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
+
 export default (sequalize) => {
 	const Comment = sequalize.define(
 		'Comment',
@@ -12,13 +13,13 @@ export default (sequalize) => {
 			},
 			text: DataTypes.STRING,
 			file_link: DataTypes.STRING,
-			home_page: DataTypes.STRING,
+			homepage: DataTypes.STRING,
 		},
 		{
 			tableName: 'comments',
 		}
 	);
 	Comment.beforeCreate((comment) => (comment.id = uuidv4()));
-
 	return Comment;
 };
+

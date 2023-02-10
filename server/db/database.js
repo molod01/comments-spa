@@ -9,17 +9,20 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 	pool: dbConfig.pool,
 });
 
-sequelize
-	.authenticate()
-	.then(() => {
-		console.log('Connection has been established successfully.');
-		const User = UserModel(sequelize);
-		const Comment = CommentModel(sequelize);
-		User.hasMany(Comment);
-		Comment.belongsTo(User);
-		Comment.hasMany(Comment);
-		sequelize.sync({ force: true });
-	})
-	.catch((err) => console.error('Unable to connect to the database:', err));
+var db = {};
 
-export default sequelize;
+db.Sequelize = Sequelize;
+db.sequelize = sequelize;
+
+db.users = UserModel(sequelize);
+db.comments = CommentModel(sequelize);
+
+//associations
+db.users.hasMany(db.comments, { as: 'comments' });
+db.comments.belongsTo(db.users, {
+	foreignKey: 'UserId',
+	as: 'user',
+});
+db.comments.hasMany(db.comments, { foreignKey: 'replyTo', as: 'replies' });
+
+export default db;
