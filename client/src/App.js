@@ -4,10 +4,11 @@ import CommentForm from './components/CommentForm.js';
 import Comments from './components/Comments.js';
 import { useWs } from './components/useWs.js';
 import './index.css';
-const WS_URL = process.env.REACT_APP_WS_URL;
+
 const App = () => {
-	const [ready, response, send] = useWs({ url: WS_URL });
+	const [ready, response, send] = useWs({ url: process.env.REACT_APP_WS_URL });
 	const [replyTo, setReplyTo] = useState(undefined);
+	const [currentPage, setCurrentPage] = useState(0);
 
 	const sendRequest = (type, object) => {
 		console.log(object);
@@ -16,8 +17,8 @@ const App = () => {
 
 	return (
 		<div className="container">
-			<CommentForm reply={{ replyTo, setReplyTo }} send={sendRequest} />
-			<Comments reply={setReplyTo} response={response} pageCount={2} />
+			<CommentForm reply={{ replyTo, setReplyTo }} send={sendRequest} changePage={setCurrentPage} />
+			<Comments reply={setReplyTo} response={response} send={sendRequest} currentPage={currentPage} />
 		</div>
 	);
 };

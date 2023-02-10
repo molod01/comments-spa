@@ -19,18 +19,19 @@ app.set('port', PORT);
 // app.use(router);
 
 const wss = new WebSocketServer({ server });
+
 const newComment = async (comment) => {
 	await CommentController.create(comment);
 };
-const sendFirstPart = async () => {};
-const updateComments = async () => {
-	CommentController.readAll().then((comments) => {
-		console.log(JSON.stringify(comments, null, 4));
-		const generalComments = comments.filter((comment) => comment.replyTo == null);
-		//console.log(JSON.stringify(generalComments, null, 4));
-		wss.clients.forEach((client) => {
-			client.send(JSON.stringify(generalComments));
-		});
+const sendPart = async (client, partIndex) => {
+	client.curentPart = partIndex;
+	const [part, pagesCount] = await CommentController.getPart(partIndex);
+	client.send(JSON.stringify({ data: part, pagesCount }));
+};
+const updateClients = async () => {
+	wss.clients.forEach(async (client) => {
+		console.log(client);
+		await sendPart(client, client.curentPart);
 	});
 };
 const dispatchMessage = async (message, ws) => {
@@ -38,11 +39,28 @@ const dispatchMessage = async (message, ws) => {
 	switch (json.event) {
 		case 'postComment':
 			await newComment(json.payload);
-			await updateComments();
+			await updateClients();
+		case 'getPart':
+			await sendPart(ws, json.payload);
 	}
 };
+// const updateComments = async () => {
+// 	CommentController.getMainComments().then((mainComments) => {
+// 		wss.clients.forEach((client) => {
+// 			client.send(JSON.stringify(mainComments));
+// 		});
+// 	});
+// 	// CommentController.readAll().then((comments) => {
+// 	// 	console.log(JSON.stringify(comments, null, 4));
+// 	// 	const generalComments = comments.filter((comment) => comment.replyTo == null);
+// 	// 	//console.log(JSON.stringify(generalComments, null, 4));
+// 	// 	wss.clients.forEach((client) => {
+// 	// 		client.send(JSON.stringify(generalComments));
+// 	// 	});
+// 	// });
+// };
 wss.on('connection', async (ws) => {
-	ws.send(JSON.stringify(await CommentController.readAll()));
+	await sendPart(ws, 0);
 	ws.on('message', (m) => {
 		dispatchMessage(m, ws);
 	});

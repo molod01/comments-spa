@@ -4,12 +4,14 @@ export const isValidFile = (file) => {
 	if (allowedMIME.includes(file.type)) {
 		if (file.type === 'text/plain' && file.size > 100000) {
 			console.log('.txt file is too big (max 100kb)');
-			return;
+			return false;
 		} else if (file.size > 4194304) {
 			console.log('image is too big (max 4mb)');
-			return;
+			return false;
 		}
-	} else console.log('file type is not allowed');
+	} else {
+		console.log('file type is not allowed');
+		return false;
+	}
+	return true;
 };
-
-

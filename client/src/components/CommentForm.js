@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { isValidFile } from '../modules/file.js';
 
-function CommentForm({ reply, send }) {
+function CommentForm({ reply, send, changePage }) {
 	const [username, setUsername] = useState('nikita');
 	const [email, setEmail] = useState('me@gmail.com');
 	const [homepage, setHomepage] = useState('http://why?');
@@ -45,9 +45,10 @@ function CommentForm({ reply, send }) {
 					send('postComment', comment);
 				};
 			}
-		} else send('postComment', comment);
+		} else await send('postComment', comment);
 		event.preventDefault();
 		clearForm();
+		if (!comment.reply_to) changePage(0);
 	};
 
 	return (
