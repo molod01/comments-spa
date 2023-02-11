@@ -51,6 +51,7 @@ const dispatchMessage = async (message, ws) => {
 // 	// 	});
 // 	// });
 // };
+
 wss.on('connection', async (ws) => {
 	await sendPart(ws, 0);
 	ws.on('message', (m) => {

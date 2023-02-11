@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
 import db from '../db/database.js';
-import { generateFileName, resizeImage, saveFile } from '../middleware/operations.js';
+import { formatDate, generateFileName, getImageAsDataURL, isImage, readText, resizeImage, saveFile } from '../middleware/operations.js';
 
 dotenv.config();
 
@@ -17,7 +17,7 @@ export const create = async (payload) => {
 	const [user, created] = await User.findOrCreate({
 		where: { ...payload.user },
 	});
-
+	console.log(payload);
 	let comment = {
 		text: payload.comment_text,
 		homepage: payload.homepage,
@@ -27,8 +27,9 @@ export const create = async (payload) => {
 	if (payload.file) {
 		let saved_file_link = await saveFile(generateFileName(payload.file.name), payload.file.body);
 		if (payload.file.type !== 'text/plain') {
-			saved_file_link = resizeImage(saved_file_link);
+			saved_file_link = await resizeImage(saved_file_link);
 		}
+		console.log(saved_file_link);
 		comment.file_link = saved_file_link;
 	}
 	await Comment.create(comment).catch((err) => {
@@ -76,13 +77,24 @@ export const getPart = async (partIndex) => {
 			const startIndex = partIndex * commentsOnPage;
 			let endIndex = startIndex + commentsOnPage;
 			if (endIndex > comments.length) endIndex = comments.length;
+
+			let comments_transformed = [];
 			for (const comment of comments) {
+				comment.dataValues.date = formatDate(comment.createdAt.toLocaleString());
+				if (comment.file_link) {
+					if (isImage(comment.file_link)) {
+						comment.dataValues.image_data = getImageAsDataURL(comment.file_link);
+					} else {
+						comment.dataValues.text_data = readText(comment.file_link);
+					}
+				}
+				comments_transformed.push(comment);
 			}
 			// console.log('pagesCount: ', pagesCount);
 			// console.log('startIndex: ', startIndex);
 			// console.log('endIndex: ', endIndex);
 			// console.log('total: ', comments.length);
-			return [comments.slice(startIndex, endIndex), pagesCount];
+			return [comments_transformed.slice(startIndex, endIndex), pagesCount];
 		}
 	});
 };
