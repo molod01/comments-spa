@@ -1,22 +1,43 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { LoadCanvasTemplate, loadCaptchaEnginge, validateCaptcha } from 'react-simple-captcha';
 import { isValidFile } from '../modules/file.js';
-
 function CommentForm({ reply, send, changePage }) {
-	const [username, setUsername] = useState('nikita');
-	const [email, setEmail] = useState('me@gmail.com');
-	const [homepage, setHomepage] = useState('http://why?');
-	const [comment_text, setText] = useState('text');
+	const [username, setUsername] = useState('');
+	const [email, setEmail] = useState('');
+	const [homepage, setHomepage] = useState('http://*');
+	const [comment_text, setText] = useState('');
 	const [file, setFile] = useState(undefined);
+	const [captcha, setCaptcha] = useState('');
 
+	useEffect(() => {
+		loadCaptchaEnginge(6, '#f3f6f4', 'black', 'upper');
+	}, []);
+
+	const validateForm = () => {
+		const isValidCaptcha = validateCaptcha(captcha);
+		const isValidUsername = /^(?=[a-zA-Z0-9._]{4,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/.test(username);
+		const isValidEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email);
+		const isValidComment =
+			/^(?:<(\w+)(?:(?:\s+\w+(?:\s*=\s*(?:".*?"|'.*?'|[^'">\s]+))?)+\s*|\s*)>[^<>]*<\/\1+\s*>|<\w+(?:(?:\s+\w+(?:\s*=\s*(?:".*?"|'.*?'|[^'">\s]+))?)+\s*|\s*)\/>|<!--.*?-->|[^<>]+)*$/.test(
+				comment_text
+			);
+		if (isValidCaptcha && isValidUsername && isValidEmail && isValidComment) return true;
+		else return false;
+	};
 	const clearForm = () => {
-		// setUsername('');
-		// setEmail('');
-		// setHomepage('http://why?');
-		// setText('');
-		// setFile(undefined);
+		setUsername('user');
+		setEmail('mail@mail.com');
+		setHomepage('http://*');
+		setText('');
+		setFile(undefined);
 		reply.setReplyTo(undefined);
 	};
 	const handleSubmit = async (event) => {
+		event.preventDefault();
+		if (!validateForm()) {
+			alert('Form is not valid!');
+			return;
+		}
 		const comment = {
 			user: {
 				username,
@@ -41,58 +62,55 @@ function CommentForm({ reply, send, changePage }) {
 					};
 				})(file);
 				reader.readAsText(file);
-				reader.onloadend = () => {
-					send('postComment', comment);
-				};
+				reader.onloadend = () => send('postComment', comment);
 			}
 		} else await send('postComment', comment);
-		event.preventDefault();
 		clearForm();
-		if (!comment.reply_to) changePage(0);
 	};
 
 	return (
 		<div className="my-4">
-			<h4 className="my-5">Comment</h4>
-			<form onSubmit={handleSubmit} className="px-5">
+			<h4 className="my-5 mx-2">Comment</h4>
+			<form onSubmit={handleSubmit}>
 				<div className="">
 					<div className="row my-2">
 						<div className="col">
-							<label htmlFor="username" className="form-label">
-								Username
-							</label>
-							<input type="text" className="form-control" id="username" value={username} onChange={(e) => setUsername(e.target.value)} required />
+							<input type="text" className="form-control" id="username" placeholder="Username" aria-label="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
 						</div>
 						<div className="col">
-							<label htmlFor="email" className="form-label">
-								E-mail
-							</label>
-							<input type="email" className="form-control" id="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+							<input type="email" className="form-control" id="email" placeholder="E-Mail" aria-label="E-Mail" value={email} onChange={(e) => setEmail(e.target.value)} required />
+						</div>
+					</div>
+					<div className="row my-2">
+						<div className="col">
+							<input type="url" className="form-control" id="homepage" placeholder="http://" aria-label="http://" value={homepage} onChange={(e) => setHomepage(e.target.value)} />
 						</div>
 					</div>
 					<div className="my-2">
-						<label htmlFor="homepage" className="form-label">
-							Home page
-						</label>
-						<input type="url" className="form-control" id="homepage" value={homepage} onChange={(e) => setHomepage(e.target.value)} />
+						<textarea
+							type="text"
+							className="form-control"
+							id="text"
+							placeholder="Your comment..."
+							aria-label="Your comment..."
+							value={comment_text}
+							onChange={(e) => setText(e.target.value)}
+							required
+						></textarea>
 					</div>
-					<div className="my-2">
-						<label htmlFor="text" className="form-label">
-							Comment text
-						</label>
-						<textarea type="text" className="form-control" id="text" value={comment_text} onChange={(e) => setText(e.target.value)} required></textarea>
+					<div className="row my-3" style={{ lineHeight: '1' }}>
+						<div className="col d-flex justify-content">
+							<LoadCanvasTemplate className="" reloadText={' '} />
+							<input type="text" className="form-control" id="captcha" value={captcha} onChange={(e) => setCaptcha(e.target.value)} required />
+						</div>
+						<div className="col">
+							<input type="file" className="form-control" id="file" placeholder="File" aria-label="File" onClick={(e) => (e.target.value = null)} onChange={(e) => setFile(e.target.files[0])} />
+						</div>
 					</div>
-					<div className="my-3">
-						<label htmlFor="file" className="form-label">
-							Attach file
-						</label>
-						<input type="file" className="form-control" id="file" onClick={(e) => (e.target.value = null)} onChange={(e) => setFile(e.target.files[0])} />
-					</div>
+					<button type="submit" className="btn btn-outline-dark w-100">
+						Comment
+					</button>
 				</div>
-				<div className="my-3 text-center">*captcha*</div>
-				<button type="submit" className="btn btn-outline-dark w-100">
-					Comment
-				</button>
 			</form>
 		</div>
 	);

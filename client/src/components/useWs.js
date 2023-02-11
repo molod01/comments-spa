@@ -8,7 +8,6 @@ export const useWs = ({ url }) => {
 
 	useEffect(() => {
 		const socket = new WebSocket(url);
-
 		socket.onopen = () => setIsReady(true);
 		socket.onclose = () => setIsReady(false);
 		socket.onmessage = (event) => {
@@ -16,6 +15,6 @@ export const useWs = ({ url }) => {
 		};
 
 		ws.current = socket;
-	}, []);
+	}, [url]);
 	return [isReady, response, ws.current?.send.bind(ws.current)];
 };

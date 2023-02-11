@@ -18,7 +18,6 @@ const saveFile = (name, data) => {
 };
 
 export const readAll = async (where) => {
-	// return await Comment.findAll({ include: ['user', 'replies'] })
 	return await Comment.findAll({ order: [['createdAt', 'DESC']], include: [{ all: true, nested: true, include: [{ all: true, nested: true, include: [{ all: true, nested: true }] }] }] })
 		.then((comments) => comments)
 		.catch((err) => console.log(`Comments's get error: ${err}`));
@@ -38,7 +37,6 @@ export const create = async (payload) => {
 	if (payload.file) {
 		comment.file_link = saveFile(payload.file.name, payload.file.body);
 	}
-	// console.log('New Comment: ', comment);
 	await Comment.create(comment).catch((err) => {
 		console.log(`Comment create error: ${err}`);
 	});
@@ -81,7 +79,7 @@ export const getPart = async (partIndex) => {
 		if (comments) {
 			const pagesCount = comments.length / commentsOnPage;
 			const startIndex = partIndex * pagesCount;
-			return [comments.slice(startIndex, startIndex + commentsOnPage), Math.round(pagesCount) + 1];
+			return [comments.slice(startIndex, startIndex + commentsOnPage), Math.round(pagesCount)];
 		}
 	});
 };

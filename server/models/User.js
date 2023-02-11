@@ -12,11 +12,11 @@ export default (sequalize) => {
 				primaryKey: true,
 			},
 			username: {
-				type: DataTypes.STRING,
+				type: DataTypes.STRING(64),
 				allowNull: false,
 			},
 			email: {
-				type: DataTypes.STRING,
+				type: DataTypes.STRING(255),
 				allowNull: false,
 			},
 		},

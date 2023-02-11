@@ -11,9 +11,12 @@ export default (sequalize) => {
 				allowNull: false,
 				primaryKey: true,
 			},
-			text: DataTypes.STRING,
-			file_link: DataTypes.STRING,
-			homepage: DataTypes.STRING,
+			text: {
+				type: DataTypes.STRING(512),
+				allowNull: false,
+			},
+			file_link: DataTypes.STRING(128),
+			homepage: DataTypes.STRING(128),
 		},
 		{
 			tableName: 'comments',
@@ -22,4 +25,3 @@ export default (sequalize) => {
 	Comment.beforeCreate((comment) => (comment.id = uuidv4()));
 	return Comment;
 };
-
