@@ -4,19 +4,11 @@ import { WebSocketServer } from 'ws';
 import CommentController from './controllers/comment.controller.js';
 import db from './db/database.js';
 
-// import router from './routes/routes.js';
-
 const PORT = process.env.PORT || 5000;
 const app = express();
 
-// const __dirname = path.resolve();
 const server = http.createServer(app);
 app.set('port', PORT);
-
-// app.use(express.static(path.resolve(__dirname, 'files')));
-// app.use(bodyParser.urlencoded({ extended: false }));
-// app.use(bodyParser.json());
-// app.use(router);
 
 const wss = new WebSocketServer({ server });
 
@@ -24,13 +16,13 @@ const newComment = async (comment) => {
 	await CommentController.create(comment);
 };
 const sendPart = async (client, partIndex) => {
+	if (!partIndex) partIndex = 0;
 	client.curentPart = partIndex;
 	const [part, pagesCount] = await CommentController.getPart(partIndex);
 	client.send(JSON.stringify({ data: part, pagesCount }));
 };
 const updateClients = async () => {
 	wss.clients.forEach(async (client) => {
-		console.log(client);
 		await sendPart(client, client.curentPart);
 	});
 };

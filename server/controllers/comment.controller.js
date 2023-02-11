@@ -1,21 +1,11 @@
-import { randomUUID } from 'crypto';
-import fs from 'fs';
+import * as dotenv from 'dotenv';
 import db from '../db/database.js';
+import { generateFileName, resizeImage, saveFile } from '../middleware/operations.js';
+
+dotenv.config();
 
 const User = db.users;
 const Comment = db.comments;
-const commentsOnPage = 5;
-
-const saveFile = (name, data) => {
-	const filename = randomUUID() + name.slice(-name.lastIndexOf('.'));
-	fs.writeFile('files/' + filename, data, (err) => {
-		if (err) {
-			return console.log(err);
-		}
-		console.log('The file was saved!');
-	});
-	return filename;
-};
 
 export const readAll = async (where) => {
 	return await Comment.findAll({ order: [['createdAt', 'DESC']], include: [{ all: true, nested: true, include: [{ all: true, nested: true, include: [{ all: true, nested: true }] }] }] })
@@ -35,7 +25,11 @@ export const create = async (payload) => {
 		replyTo: payload.reply_to,
 	};
 	if (payload.file) {
-		comment.file_link = saveFile(payload.file.name, payload.file.body);
+		let saved_file_link = await saveFile(generateFileName(payload.file.name), payload.file.body);
+		if (payload.file.type !== 'text/plain') {
+			saved_file_link = resizeImage(saved_file_link);
+		}
+		comment.file_link = saved_file_link;
 	}
 	await Comment.create(comment).catch((err) => {
 		console.log(`Comment create error: ${err}`);
@@ -76,10 +70,19 @@ export const getMainComments = async () => {
 
 export const getPart = async (partIndex) => {
 	return getMainComments().then((comments) => {
+		const commentsOnPage = parseInt(process.env.COMMENTS_ON_PAGE);
 		if (comments) {
-			const pagesCount = comments.length / commentsOnPage;
-			const startIndex = partIndex * pagesCount;
-			return [comments.slice(startIndex, startIndex + commentsOnPage), Math.round(pagesCount)];
+			const pagesCount = Math.ceil(comments.length / commentsOnPage);
+			const startIndex = partIndex * commentsOnPage;
+			let endIndex = startIndex + commentsOnPage;
+			if (endIndex > comments.length) endIndex = comments.length;
+			for (const comment of comments) {
+			}
+			// console.log('pagesCount: ', pagesCount);
+			// console.log('startIndex: ', startIndex);
+			// console.log('endIndex: ', endIndex);
+			// console.log('total: ', comments.length);
+			return [comments.slice(startIndex, endIndex), pagesCount];
 		}
 	});
 };

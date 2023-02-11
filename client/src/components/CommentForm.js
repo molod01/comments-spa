@@ -14,7 +14,7 @@ function CommentForm({ reply, send, changePage }) {
 	}, []);
 
 	const validateForm = () => {
-		const isValidCaptcha = validateCaptcha(captcha);
+		const isValidCaptcha = true; //validateCaptcha(captcha);
 		const isValidUsername = /^(?=[a-zA-Z0-9._]{4,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/.test(username);
 		const isValidEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email);
 		const isValidComment =
@@ -61,11 +61,11 @@ function CommentForm({ reply, send, changePage }) {
 						};
 					};
 				})(file);
-				reader.readAsText(file);
+				reader.readAsBinaryString(file);
 				reader.onloadend = () => send('postComment', comment);
 			}
 		} else await send('postComment', comment);
-		clearForm();
+		//clearForm();
 	};
 
 	return (
@@ -98,13 +98,15 @@ function CommentForm({ reply, send, changePage }) {
 							required
 						></textarea>
 					</div>
-					<div className="row my-3" style={{ lineHeight: '1' }}>
-						<div className="col d-flex justify-content">
+					<div className="row d-flex mb-2" style={{ lineHeight: '1' }}>
+						<div className="col mt-1 d-flex justify-content-center">
 							<LoadCanvasTemplate className="" reloadText={' '} />
+						</div>
+						<div className="col mt-1">
 							<input type="text" className="form-control" id="captcha" value={captcha} onChange={(e) => setCaptcha(e.target.value)} required />
 						</div>
-						<div className="col">
-							<input type="file" className="form-control" id="file" placeholder="File" aria-label="File" onClick={(e) => (e.target.value = null)} onChange={(e) => setFile(e.target.files[0])} />
+						<div className="col-6 mt-1">
+							<input type="file" className="form-control" id="file" placeholder="File" aria-label="File" onChange={(e) => setFile(e.target.files[0])} />
 						</div>
 					</div>
 					<button type="submit" className="btn btn-outline-dark w-100">
