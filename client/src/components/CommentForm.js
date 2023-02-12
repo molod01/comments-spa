@@ -12,17 +12,6 @@ function CommentForm({ reply, send, changePage }) {
 	const [reply_to, setReplyTo] = useState(reply.replyTo);
 	const [replyBlock, setReplyBlock] = useState(reply.replyBlock);
 
-	// useEffect(() => {
-	// 	if (reply_to) {
-	// 		let reply_to_mark = document.getElementById('reply_to');
-	// 		const replied_comment = document.getElementById('comment_' + reply_to_mark.getAttribute('reply_to'));
-	// 		let reply_copy = replied_comment.cloneNode(true);
-	// 		//reply_copy.removeChild();
-
-	// 		reply_to_mark.append(reply_copy);
-	// 	}
-	// }, [reply_to]);
-
 	useEffect(() => {
 		setReplyTo(reply.replyTo);
 		setReplyBlock(reply.replyBlock);
@@ -38,7 +27,7 @@ function CommentForm({ reply, send, changePage }) {
 	const previewButton = () => {
 		if (username && email && comment_text) {
 			return (
-				<button type="button" className="btn btn-outline-secondary mt-3 w-100" data-bs-toggle="modal" data-bs-target="#preview">
+				<button type="button" className="btn btn-sm btn-outline-secondary mt-3 w-100" data-bs-toggle="modal" data-bs-target="#preview">
 					Preview
 				</button>
 			);
@@ -98,7 +87,6 @@ function CommentForm({ reply, send, changePage }) {
 						comment.file = {
 							name: file.name,
 							type: file.type,
-							size: file.size,
 							body: r.result,
 						};
 					};
@@ -169,6 +157,20 @@ function CommentForm({ reply, send, changePage }) {
 							<div className="col">
 								<input type="url" className="form-control" id="homepage" placeholder="http://" aria-label="http://" value={homepage} onChange={(e) => setHomepage(e.target.value)} />
 							</div>
+						</div>
+						<div className="my-2 btn-group btn-group-sm w-100">
+							<button onClick={() => setText(comment_text + '<i></i>')} className="btn btn-secondary mx-1 ">
+								[i]
+							</button>
+							<button onClick={() => setText(comment_text + '<strong></strong>')} className="btn btn-secondary mx-1 ">
+								[strong]
+							</button>
+							<button onClick={() => setText(comment_text + '<code></code>')} className="btn btn-secondary mx-1 ">
+								[code]
+							</button>
+							<button onClick={() => setText(comment_text + '<a href="" title=""></a>')} className="btn btn-secondary mx-1 ">
+								[a]
+							</button>
 						</div>
 						<div className="my-2">
 							<textarea

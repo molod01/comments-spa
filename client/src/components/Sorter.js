@@ -8,7 +8,7 @@ function Sorter({ passSortBy }) {
 
 	return (
 		<div class="form-floating mx-1">
-			<select onChangeCapture={(e) => setSortBy(e.target.value)} class="form-select" id="floatingSelect" aria-label="Sort">
+			<select onChangeCapture={(e) => setSortBy(e.target.value)} class="form-select px-3" id="floatingSelect" aria-label="Sort">
 				<option selected value="createdAt_desc">
 					Date ^
 				</option>
