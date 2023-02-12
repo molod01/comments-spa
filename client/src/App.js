@@ -6,7 +6,7 @@ import { useWs } from './components/useWs.js';
 import './index.css';
 
 const App = () => {
-	const [ready, response, send] = useWs({ url: process.env.REACT_APP_WS_URL });
+	const [response, send] = useWs({ url: process.env.REACT_APP_WS_URL });
 	const [replyTo, setReplyTo] = useState(undefined);
 	const [currentPage, setCurrentPage] = useState(0);
 

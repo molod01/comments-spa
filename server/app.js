@@ -62,6 +62,6 @@ wss.on('connection', async (ws) => {
 });
 
 server.listen(PORT, () => {
-	db.sequelize.sync({ force: false });
+	db.sequelize.sync({ force: false});
 	console.log(`http://localhost:${PORT}`);
 });

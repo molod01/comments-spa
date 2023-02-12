@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { LoadCanvasTemplate, loadCaptchaEnginge, validateCaptcha } from 'react-simple-captcha';
 import { isValidFile } from '../modules/file.js';
+
 function CommentForm({ reply, send, changePage }) {
 	const [username, setUsername] = useState('');
 	const [email, setEmail] = useState('');
-	const [homepage, setHomepage] = useState('http://*');
+	const [homepage, setHomepage] = useState('http://website.com');
 	const [comment_text, setText] = useState('');
 	const [file, setFile] = useState(undefined);
 	const [captcha, setCaptcha] = useState('');
@@ -27,7 +28,7 @@ function CommentForm({ reply, send, changePage }) {
 	const clearForm = () => {
 		setUsername('user');
 		setEmail('mail@mail.com');
-		setHomepage('http://*');
+		setHomepage('http://website.com');
 		setText('');
 		setFile(undefined);
 		reply.setReplyTo(undefined);
@@ -98,16 +99,16 @@ function CommentForm({ reply, send, changePage }) {
 							required
 						></textarea>
 					</div>
-					<div className="row d-flex mb-2" style={{ lineHeight: '1' }}>
-						<div className="col mt-1 d-flex justify-content-center">
+					<div className="row d-flex mb-2">
+						<div className="col mt-1 d-flex justify-content-center pt-2">
 							<LoadCanvasTemplate className="" reloadText={' '} />
 						</div>
 						<div className="col mt-1">
 							<input type="text" className="form-control" id="captcha" value={captcha} onChange={(e) => setCaptcha(e.target.value)} required />
 						</div>
-						<div className="col-6 mt-1">
-							<input type="file" className="form-control" id="file" placeholder="File" aria-label="File" onChange={(e) => setFile(e.target.files[0])} />
-						</div>
+					</div>
+					<div className="mt-2 mb-3">
+						<input type="file" className="form-control" id="file" placeholder="File" aria-label="File" onChange={(e) => setFile(e.target.files[0])} />
 					</div>
 					<button type="submit" className="btn btn-outline-dark w-100">
 						Comment

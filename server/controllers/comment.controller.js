@@ -88,6 +88,7 @@ export const getPart = async (partIndex) => {
 						comment.dataValues.text_data = readText(comment.file_link);
 					}
 				}
+				console.log(comment);
 				comments_transformed.push(comment);
 			}
 			// console.log('pagesCount: ', pagesCount);
