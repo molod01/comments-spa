@@ -7,9 +7,9 @@ function Sorter({ passSortBy }) {
 	}, [sortBy]);
 
 	return (
-		<div class="form-floating mx-1">
-			<select onChangeCapture={(e) => setSortBy(e.target.value)} class="form-select px-3" id="floatingSelect" aria-label="Sort">
-				<option selected value="createdAt_desc">
+		<div className="form-floating mx-1">
+			<select onChangeCapture={(e) => setSortBy(e.target.value)} className="form-select px-3" id="floatingSelect" aria-label="Sort">
+				<option value="createdAt_desc" defaultValue="createdAt_desc">
 					Date ^
 				</option>
 				<option value="createdAt_asc">Date v</option>
@@ -18,7 +18,7 @@ function Sorter({ passSortBy }) {
 				<option value="email_desc">Email ^</option>
 				<option value="email_asc">Email v</option>
 			</select>
-			<label className="ms-2" for="floatingSelect">
+			<label className="ms-2" htmlFor="floatingSelect">
 				Sort By
 			</label>
 		</div>

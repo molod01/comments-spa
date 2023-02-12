@@ -1,17 +1,16 @@
 const allowedMIME = ['text/plain', 'image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
 
-export const isValidFile = (file) => {
-	if (allowedMIME.includes(file.type)) {
-		if (file.type === 'text/plain' && file.size > 100000) {
-			console.log('.txt file is too big (max 100kb)');
-			return false;
-		} else if (file.size > 4194304) {
-			console.log('image is too big (max 4mb)');
-			return false;
-		}
-	} else {
-		console.log('file type is not allowed');
-		return false;
-	}
-	return true;
+export const isValidFileType = (file) => file && allowedMIME.includes(file.type);
+
+export const isValidFileSize = (file) => {
+	if (!file) return false;
+	if (isTextFile(file)) {
+		return file.size <= 100000;
+	} else return file.size < 8388608;
 };
+
+export const isValidFileTextSize = (file) => file && file.size <= 100000;
+
+export const isValidFileImageSize = (file) => file && file.size < 8388608;
+
+export const isTextFile = (file) => file && file.type === 'text/plain';

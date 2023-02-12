@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
 
-function Comments({ reply, replyBlock, response, send, currentPage }) {
+function Comments({ reply, replyBlock, response, send, currentPageParent }) {
 	const [comments, setComments] = useState(JSON.parse(response)?.data);
 	const [pagesCount, setPagesCount] = useState(JSON.parse(response)?.pagesCount);
+	const [currentPage, setCurrentPage] = useState(currentPageParent);
 
 	useEffect(() => {
+		if (!response) setComments(undefined);
 		const object = JSON.parse(response);
 		if (object) {
 			if (object.data.length) setComments(object.data);
@@ -13,7 +15,9 @@ function Comments({ reply, replyBlock, response, send, currentPage }) {
 		}
 	}, [response]);
 
-	useEffect(() => {}, [currentPage]);
+	const handlePageClick = async (e) => {
+		await send('getPart', e.selected);
+	};
 
 	const getCommentsAndReplies = (comments) => {
 		const allComments = [];
@@ -25,6 +29,7 @@ function Comments({ reply, replyBlock, response, send, currentPage }) {
 		}
 		return allComments;
 	};
+
 	const generateReply = (id) => {
 		if (id) {
 			const replyComment = getCommentsAndReplies(comments).find((comment) => comment.id === id);
@@ -56,7 +61,7 @@ function Comments({ reply, replyBlock, response, send, currentPage }) {
 										width="16"
 										height="16"
 										fill="currentColor"
-										class="bi bi-x"
+										className="bi bi-x"
 										viewBox="0 0 16 16"
 									>
 										<path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
@@ -75,10 +80,7 @@ function Comments({ reply, replyBlock, response, send, currentPage }) {
 			}
 		} else replyBlock('');
 	};
-	const handlePageClick = async (e) => {
-		await send('getPart', e.selected);
-		//window.scrollTo(0, 0);
-	};
+
 	const renderFile = (text_data) => {
 		return (
 			<div className="mt-2">
@@ -105,7 +107,6 @@ function Comments({ reply, replyBlock, response, send, currentPage }) {
 	const renderComments = (comments, isChild) => {
 		if (comments) {
 			return comments.map((comment) => {
-				console.log(comment);
 				const childRender = renderComments(comment.replies, true);
 				let attachRender;
 				if (comment.image_data) {
@@ -151,8 +152,8 @@ function Comments({ reply, replyBlock, response, send, currentPage }) {
 		} else
 			return (
 				<div className="d-flex justify-content-center my-5">
-					<div class="spinner-border" role="status">
-						<span class="visually-hidden">Loading...</span>
+					<div className="spinner-border" role="status">
+						<span className="visually-hidden">Loading...</span>
 					</div>
 				</div>
 			);

@@ -18,12 +18,13 @@ const newComment = async (comment) => {
 const sendPart = async (client, partIndex, sortBy) => {
 	if (!partIndex) partIndex = 0;
 	client.curentPart = partIndex;
+	client.currentSort = sortBy;
 	const [part, pagesCount] = await CommentController.getPart(partIndex, sortBy);
 	client.send(JSON.stringify({ data: part, pagesCount }));
 };
 const updateClients = async () => {
 	wss.clients.forEach(async (client) => {
-		await sendPart(client, client.curentPart);
+		await sendPart(client, client.curentPart, client.currentSort);
 	});
 };
 const dispatchMessage = async (message, ws) => {
@@ -36,21 +37,6 @@ const dispatchMessage = async (message, ws) => {
 			await sendPart(ws, json.payload.part, json.payload.sortBy);
 	}
 };
-// const updateComments = async () => {
-// 	CommentController.getMainComments().then((mainComments) => {
-// 		wss.clients.forEach((client) => {
-// 			client.send(JSON.stringify(mainComments));
-// 		});
-// 	});
-// 	// CommentController.readAll().then((comments) => {
-// 	// 	console.log(JSON.stringify(comments, null, 4));
-// 	// 	const generalComments = comments.filter((comment) => comment.replyTo == null);
-// 	// 	//console.log(JSON.stringify(generalComments, null, 4));
-// 	// 	wss.clients.forEach((client) => {
-// 	// 		client.send(JSON.stringify(generalComments));
-// 	// 	});
-// 	// });
-// };
 
 wss.on('connection', async (ws) => {
 	await sendPart(ws, 0);
@@ -62,6 +48,6 @@ wss.on('connection', async (ws) => {
 });
 
 server.listen(PORT, () => {
-	db.sequelize.sync({ force: false});
+	db.sequelize.sync({ force: false });
 	console.log(`http://localhost:${PORT}`);
 });

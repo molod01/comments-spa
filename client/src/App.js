@@ -7,7 +7,7 @@ import { useWs } from './components/useWs.js';
 import './index.css';
 
 const App = () => {
-	const [response, send] = useWs({ url: process.env.REACT_APP_WS_URL });
+	const [response, send, clearResponse] = useWs({ url: process.env.REACT_APP_WS_URL });
 	const [replyTo, setReplyTo] = useState(undefined);
 	const [currentPage, setCurrentPage] = useState(0);
 	const [replyBlock, setReplyBlock] = useState(undefined);
@@ -26,8 +26,13 @@ const App = () => {
 	useEffect(() => {}, [replyTo]);
 
 	useEffect(() => {
+		console.log('1');
 		if (send) {
+			console.log('clear');
+
+			clearResponse();
 			sendRequest('getPart', 0);
+			setCurrentPage(0);
 		}
 	}, [sortBy]);
 
@@ -35,7 +40,7 @@ const App = () => {
 		<div className="container">
 			<CommentForm reply={{ replyTo, setReplyTo, replyBlock }} send={sendRequest} changePage={setCurrentPage} />
 			<Sorter passSortBy={setSortBy} />
-			<Comments reply={setReplyTo} replyBlock={setReplyBlock} response={response} send={sendRequest} currentPage={currentPage} />
+			<Comments reply={setReplyTo} replyBlock={setReplyBlock} response={response} send={sendRequest} currentPageParent={currentPage} />
 		</div>
 	);
 };

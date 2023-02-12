@@ -17,7 +17,6 @@ export const create = async (payload) => {
 	const [user, created] = await User.findOrCreate({
 		where: { ...payload.user },
 	});
-	console.log(payload);
 	let comment = {
 		text: payload.comment_text,
 		homepage: payload.homepage,
@@ -97,7 +96,6 @@ export const getPart = async (partIndex, sortBy = 'createdAt_desc') => {
 						comment.dataValues.text_data = readText(comment.file_link);
 					}
 				}
-				console.log(comment);
 				comments_transformed.push(comment);
 			}
 			return [comments_transformed.slice(startIndex, endIndex), pagesCount];
