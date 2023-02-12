@@ -9,6 +9,24 @@ function CommentForm({ reply, send, changePage }) {
 	const [comment_text, setText] = useState('');
 	const [file, setFile] = useState(undefined);
 	const [captcha, setCaptcha] = useState('');
+	const [reply_to, setReplyTo] = useState(reply.replyTo);
+	const [replyBlock, setReplyBlock] = useState(reply.replyBlock);
+	
+	// useEffect(() => {
+	// 	if (reply_to) {
+	// 		let reply_to_mark = document.getElementById('reply_to');
+	// 		const replied_comment = document.getElementById('comment_' + reply_to_mark.getAttribute('reply_to'));
+	// 		let reply_copy = replied_comment.cloneNode(true);
+	// 		//reply_copy.removeChild();
+
+	// 		reply_to_mark.append(reply_copy);
+	// 	}
+	// }, [reply_to]);
+
+	useEffect(() => {
+		setReplyTo(reply.replyTo);
+		setReplyBlock(reply.replyBlock);
+	}, [reply]);
 
 	useEffect(() => {
 		loadCaptchaEnginge(6, '#f3f6f4', 'black', 'upper');
@@ -24,6 +42,18 @@ function CommentForm({ reply, send, changePage }) {
 			);
 		if (isValidCaptcha && isValidUsername && isValidEmail && isValidComment) return true;
 		else return false;
+	};
+	const reply_mark = () => {
+		if (replyBlock) {
+			return (
+				<>
+					<div className="my-3">
+						<h5 className="mx-2">Reply to</h5>
+						{replyBlock}
+					</div>
+				</>
+			);
+		}
 	};
 	const clearForm = () => {
 		setUsername('user');
@@ -46,7 +76,7 @@ function CommentForm({ reply, send, changePage }) {
 			},
 			homepage,
 			comment_text,
-			reply_to: reply.replyTo,
+			reply_to: reply_to,
 		};
 		if (file) {
 			if (isValidFile(file)) {
@@ -72,8 +102,9 @@ function CommentForm({ reply, send, changePage }) {
 	return (
 		<div className="my-4">
 			<h4 className="my-5 mx-2">Comment</h4>
+			{reply_mark()}
 			<form onSubmit={handleSubmit}>
-				<div className="">
+				<div>
 					<div className="row my-2">
 						<div className="col">
 							<input type="text" className="form-control" id="username" placeholder="Username" aria-label="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
-function Comments({ reply, response, send, currentPage }) {
+
+function Comments({ reply, replyBlock, response, send, currentPage }) {
 	const [comments, setComments] = useState(JSON.parse(response)?.data);
 	const [pagesCount, setPagesCount] = useState(JSON.parse(response)?.pagesCount);
 
@@ -14,6 +15,66 @@ function Comments({ reply, response, send, currentPage }) {
 
 	useEffect(() => {}, [currentPage]);
 
+	const getCommentsAndReplies = (comments) => {
+		const allComments = [];
+		for (const comment of comments) {
+			allComments.push(comment);
+			if (comment.replies) {
+				allComments.push(...getCommentsAndReplies(comment.replies));
+			}
+		}
+		return allComments;
+	};
+	const generateReply = (id) => {
+		if (id) {
+			const replyComment = getCommentsAndReplies(comments).find((comment) => comment.id === id);
+			if (replyComment) {
+				let attachRender;
+				if (replyComment.image_data) {
+					attachRender = renderImage(replyComment.image_data, 'image_' + replyComment.id);
+				} else if (replyComment.text_data) {
+					attachRender = renderFile(replyComment.text_data);
+				}
+				replyBlock(
+					<div className={'d-flex flex-row p-3 mb-2 mx-1 rounded-2 general-comment mt-3'}>
+						<div className="w-100">
+							<div className="d-flex justify-content-between align-items-center">
+								<div className="d-flex flex-row align-items-center">
+									<span className="me-2">{replyComment.user.username}</span>
+									<small className="mail px-2 mt-1 mx-2 rounded-3 bg-primary text-white">{replyComment.user.email}</small>
+								</div>
+								<div>
+									<small className="me-2" style={{ fontSize: 10 }}>
+										{replyComment.date}
+									</small>
+									<svg
+										onClick={() => {
+											reply(undefined);
+											generateReply(undefined);
+										}}
+										xmlns="http://www.w3.org/2000/svg"
+										width="16"
+										height="16"
+										fill="currentColor"
+										class="bi bi-x"
+										viewBox="0 0 16 16"
+									>
+										<path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+									</svg>
+								</div>
+							</div>
+							<div className="text-break">
+								<p className="text-justify mb-0 mt-2" style={{ fontSize: '11pt', fontFamily: 'sans-serif' }}>
+									{replyComment.text}
+								</p>
+							</div>
+							{attachRender}
+						</div>
+					</div>
+				);
+			}
+		} else replyBlock('');
+	};
 	const handlePageClick = async (e) => {
 		await send('getPart', e.selected);
 		//window.scrollTo(0, 0);
@@ -41,13 +102,12 @@ function Comments({ reply, response, send, currentPage }) {
 			</div>
 		);
 	};
-
 	const renderComments = (comments, isChild) => {
 		if (comments) {
 			return comments.map((comment) => {
+				console.log(comment);
 				const childRender = renderComments(comment.replies, true);
 				let attachRender;
-				console.log(comment);
 				if (comment.image_data) {
 					attachRender = renderImage(comment.image_data, 'image_' + comment.id);
 				} else if (comment.text_data) {
@@ -74,7 +134,7 @@ function Comments({ reply, response, send, currentPage }) {
 									<span
 										onClick={(e) => {
 											reply(e.currentTarget.id);
-											console.log(e.currentTarget.id);
+											generateReply(e.currentTarget.id);
 										}}
 										className="reply"
 										id={comment.id}
