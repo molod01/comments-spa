@@ -18,4 +18,11 @@ server.on('upgrade', (req, socket, head) => {
 	wss.handleUpgrade(req, socket, head, (socket) => {
 		wss.emit('connection', socket, req);
 	});
+	ws.on('error', (e) => ws.send(e));
+	ws.on('close', () => console.log('close'));
+});
+
+server.listen(PORT, () => {
+	db.sequelize.sync({ force: false});
+	console.log(`http://localhost:${PORT}`);
 });
