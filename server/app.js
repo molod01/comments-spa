@@ -15,10 +15,10 @@ const wss = new WebSocketServer({ server });
 const newComment = async (comment) => {
 	await CommentController.create(comment);
 };
-const sendPart = async (client, partIndex) => {
+const sendPart = async (client, partIndex, sortBy) => {
 	if (!partIndex) partIndex = 0;
 	client.curentPart = partIndex;
-	const [part, pagesCount] = await CommentController.getPart(partIndex);
+	const [part, pagesCount] = await CommentController.getPart(partIndex, sortBy);
 	client.send(JSON.stringify({ data: part, pagesCount }));
 };
 const updateClients = async () => {
@@ -33,7 +33,7 @@ const dispatchMessage = async (message, ws) => {
 			await newComment(json.payload);
 			await updateClients();
 		case 'getPart':
-			await sendPart(ws, json.payload);
+			await sendPart(ws, json.payload.part, json.payload.sortBy);
 	}
 };
 // const updateComments = async () => {

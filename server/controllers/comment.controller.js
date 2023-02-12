@@ -61,16 +61,25 @@ export const getCount = async () => {
 	});
 };
 
-export const getMainComments = async () => {
-	return await Comment.findAll({
-		where: { replyTo: null },
-		order: [['createdAt', 'DESC']],
-		include: [{ all: true, nested: true, include: [{ all: true, nested: true, include: [{ all: true, nested: true }] }] }],
-	});
+export const getMainComments = async (sortBy = 'createdAt_desc') => {
+	const [by, dir] = sortBy.split('_');
+	if (by === 'createdAt') {
+		return await Comment.findAll({
+			where: { replyTo: null },
+			order: [[by, dir]],
+			include: [{ all: true, nested: true, include: [{ all: true, nested: true, include: [{ all: true, nested: true }] }] }],
+		});
+	} else {
+		return await Comment.findAll({
+			where: { replyTo: null },
+			order: [[{ model: User, as: 'user' }, by, dir]],
+			include: [{ all: true, nested: true, include: [{ all: true, nested: true, include: [{ all: true, nested: true }] }] }],
+		});
+	}
 };
 
-export const getPart = async (partIndex) => {
-	return getMainComments().then((comments) => {
+export const getPart = async (partIndex, sortBy = 'createdAt_desc') => {
+	return getMainComments(sortBy).then((comments) => {
 		const commentsOnPage = parseInt(process.env.COMMENTS_ON_PAGE);
 		if (comments) {
 			const pagesCount = Math.ceil(comments.length / commentsOnPage);
@@ -91,10 +100,6 @@ export const getPart = async (partIndex) => {
 				console.log(comment);
 				comments_transformed.push(comment);
 			}
-			// console.log('pagesCount: ', pagesCount);
-			// console.log('startIndex: ', startIndex);
-			// console.log('endIndex: ', endIndex);
-			// console.log('total: ', comments.length);
 			return [comments_transformed.slice(startIndex, endIndex), pagesCount];
 		}
 	});
