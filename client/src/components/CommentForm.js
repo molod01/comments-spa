@@ -11,7 +11,7 @@ function CommentForm({ reply, send, changePage }) {
 	const [captcha, setCaptcha] = useState('');
 	const [reply_to, setReplyTo] = useState(reply.replyTo);
 	const [replyBlock, setReplyBlock] = useState(reply.replyBlock);
-	
+
 	// useEffect(() => {
 	// 	if (reply_to) {
 	// 		let reply_to_mark = document.getElementById('reply_to');
@@ -32,6 +32,18 @@ function CommentForm({ reply, send, changePage }) {
 		loadCaptchaEnginge(6, '#f3f6f4', 'black', 'upper');
 	}, []);
 
+	const formatDate = (date) => {
+		return date.replace('T', ' ').slice(0, -5);
+	};
+	const previewButton = () => {
+		if (username && email && comment_text) {
+			return (
+				<button type="button" className="btn btn-outline-secondary mt-3 w-100" data-bs-toggle="modal" data-bs-target="#preview">
+					Preview
+				</button>
+			);
+		}
+	};
 	const validateForm = () => {
 		const isValidCaptcha = true; //validateCaptcha(captcha);
 		const isValidUsername = /^(?=[a-zA-Z0-9._]{4,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/.test(username);
@@ -46,12 +58,10 @@ function CommentForm({ reply, send, changePage }) {
 	const reply_mark = () => {
 		if (replyBlock) {
 			return (
-				<>
-					<div className="my-3">
-						<h5 className="mx-2">Reply to</h5>
-						{replyBlock}
-					</div>
-				</>
+				<div className="my-3">
+					<h5 className="mx-2">Reply to</h5>
+					{replyBlock}
+				</div>
 			);
 		}
 	};
@@ -62,6 +72,7 @@ function CommentForm({ reply, send, changePage }) {
 		setText('');
 		setFile(undefined);
 		reply.setReplyTo(undefined);
+		setReplyBlock(undefined);
 	};
 	const handleSubmit = async (event) => {
 		event.preventDefault();
@@ -100,53 +111,96 @@ function CommentForm({ reply, send, changePage }) {
 	};
 
 	return (
-		<div className="my-4">
-			<h4 className="my-5 mx-2">Comment</h4>
-			{reply_mark()}
-			<form onSubmit={handleSubmit}>
-				<div>
-					<div className="row my-2">
-						<div className="col">
-							<input type="text" className="form-control" id="username" placeholder="Username" aria-label="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
+		<>
+			<div class="modal fade" id="preview" tabindex="-1" aria-labelledby="previewLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h1 class="modal-title fs-5" id="previewLabel">
+								Modal title
+							</h1>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 						</div>
-						<div className="col">
-							<input type="email" className="form-control" id="email" placeholder="E-Mail" aria-label="E-Mail" value={email} onChange={(e) => setEmail(e.target.value)} required />
+						<div class="modal-body">
+							<div className="d-flex flex-row p-3 mb-2 mx-1 rounded-2 general-comment mt-3">
+								<div className="w-100">
+									<div className="d-flex justify-content-between align-items-center">
+										<div className="d-flex flex-row align-items-center">
+											<span className="me-2">{username}</span>
+											<small className="mail px-2 mt-1 mx-2 rounded-3 bg-primary text-white">{email}</small>
+										</div>
+										<small style={{ fontSize: 10 }}>{formatDate(new Date().toISOString())}</small>
+									</div>
+									<div className="text-break">
+										<p className="text-justify mb-0 mt-2" style={{ fontSize: '11pt', fontFamily: 'sans-serif' }}>
+											{comment_text}
+										</p>
+									</div>
+									<div className="d-flex flex-row mt-2">
+										<span className="reply">
+											Reply<i className="fa fa-comment ms-2"></i>
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+								Close
+							</button>
 						</div>
 					</div>
-					<div className="row my-2">
-						<div className="col">
-							<input type="url" className="form-control" id="homepage" placeholder="http://" aria-label="http://" value={homepage} onChange={(e) => setHomepage(e.target.value)} />
-						</div>
-					</div>
-					<div className="my-2">
-						<textarea
-							type="text"
-							className="form-control"
-							id="text"
-							placeholder="Your comment..."
-							aria-label="Your comment..."
-							value={comment_text}
-							onChange={(e) => setText(e.target.value)}
-							required
-						></textarea>
-					</div>
-					<div className="row d-flex mb-2">
-						<div className="col mt-1 d-flex justify-content-center pt-2">
-							<LoadCanvasTemplate className="" reloadText={' '} />
-						</div>
-						<div className="col mt-1">
-							<input type="text" className="form-control" id="captcha" value={captcha} onChange={(e) => setCaptcha(e.target.value)} required />
-						</div>
-					</div>
-					<div className="mt-2 mb-3">
-						<input type="file" className="form-control" id="file" placeholder="File" aria-label="File" onChange={(e) => setFile(e.target.files[0])} />
-					</div>
-					<button type="submit" className="btn btn-outline-dark w-100">
-						Comment
-					</button>
 				</div>
-			</form>
-		</div>
+			</div>
+			<div className="my-4">
+				<h4 className="my-5 mx-2">Comment</h4>
+				{reply_mark()}
+				<form onSubmit={handleSubmit}>
+					<div>
+						<div className="row my-2">
+							<div className="col">
+								<input type="text" className="form-control" id="username" placeholder="Username" aria-label="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
+							</div>
+							<div className="col">
+								<input type="email" className="form-control" id="email" placeholder="E-Mail" aria-label="E-Mail" value={email} onChange={(e) => setEmail(e.target.value)} required />
+							</div>
+						</div>
+						<div className="row my-2">
+							<div className="col">
+								<input type="url" className="form-control" id="homepage" placeholder="http://" aria-label="http://" value={homepage} onChange={(e) => setHomepage(e.target.value)} />
+							</div>
+						</div>
+						<div className="my-2">
+							<textarea
+								type="text"
+								className="form-control"
+								id="text"
+								placeholder="Your comment..."
+								aria-label="Your comment..."
+								value={comment_text}
+								onChange={(e) => setText(e.target.value)}
+								required
+							></textarea>
+						</div>
+						<div className="row d-flex mb-2">
+							<div className="col mt-1 d-flex justify-content-center pt-2">
+								<LoadCanvasTemplate className="" reloadText={' '} />
+							</div>
+							<div className="col mt-1">
+								<input type="text" className="form-control" id="captcha" value={captcha} onChange={(e) => setCaptcha(e.target.value)} required />
+							</div>
+						</div>
+						<div className="mt-2 mb-3">
+							<input type="file" className="form-control" id="file" placeholder="File" aria-label="File" onChange={(e) => setFile(e.target.files[0])} />
+						</div>
+						{previewButton()}
+						<button type="submit" className="btn btn-outline-dark mt-3 w-100">
+							Comment
+						</button>
+					</div>
+				</form>
+			</div>
+		</>
 	);
 }
 

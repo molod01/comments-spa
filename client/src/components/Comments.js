@@ -36,7 +36,7 @@ function Comments({ reply, replyBlock, response, send, currentPage }) {
 					attachRender = renderFile(replyComment.text_data);
 				}
 				replyBlock(
-					<div className={'d-flex flex-row p-3 mb-2 mx-1 rounded-2 general-comment mt-3'}>
+					<div className="d-flex flex-row p-3 mb-2 mx-1 rounded-2 general-comment mt-3">
 						<div className="w-100">
 							<div className="d-flex justify-content-between align-items-center">
 								<div className="d-flex flex-row align-items-center">
@@ -148,7 +148,14 @@ function Comments({ reply, replyBlock, response, send, currentPage }) {
 					</>
 				);
 			});
-		}
+		} else
+			return (
+				<div className="d-flex justify-content-center my-5">
+					<div class="spinner-border" role="status">
+						<span class="visually-hidden">Loading...</span>
+					</div>
+				</div>
+			);
 	};
 	return (
 		<div id="comments" className="mt-2">

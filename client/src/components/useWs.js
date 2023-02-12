@@ -13,5 +13,6 @@ export const useWs = ({ url }) => {
 
 		ws.current = socket;
 	}, [url]);
+	
 	return [response, ws.current?.send.bind(ws.current)];
 };
