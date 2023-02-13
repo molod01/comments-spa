@@ -2,6 +2,7 @@ import { randomUUID } from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
+import { isTextFile } from '../../client/src/modules/file';
 
 export const generateFileName = (name) => {
 	return 'files/' + randomUUID() + name.slice(name.lastIndexOf('.'));
@@ -49,4 +50,23 @@ export const getImageAsDataURL = (filename) => {
 
 export const readText = (filename) => {
 	return fs.readFileSync(filename, 'utf-8');
+};
+
+export const transformData = (comments) => {
+	let comments_transformed = [];
+	for (const comment of comments) {
+		comment.dataValues.date = formatDate(comment.createdAt.toLocaleString());
+		if (comment.file_link) {
+			if (isImage(comment.file_link)) {
+				comment.dataValues.image_data = getImageAsDataURL(comment.file_link);
+			} else if (isTextFile(comment.file_link)) {
+				comment.dataValues.text_data = readText(comment.file_link);
+			} else throw (err) => console.log(err);
+		}
+		if (comment.replies) {
+			comment.dataValues.replies = transformData(comment.replies.filter((reply) => reply.user));
+		}
+		comments_transformed.push(comment);
+	}
+	return comments_transformed;
 };

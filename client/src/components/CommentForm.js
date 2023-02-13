@@ -5,7 +5,7 @@ import { validateForm } from '../modules/validations.js';
 function CommentForm({ reply, send, changePage }) {
 	const [username, setUsername] = useState('');
 	const [email, setEmail] = useState('');
-	const [homepage, setHomepage] = useState('');
+	const [homepage, setHomepage] = useState(undefined);
 	const [comment_text, setText] = useState('');
 	const [file, setFile] = useState(undefined);
 	const [captcha, setCaptcha] = useState('');
@@ -90,8 +90,8 @@ function CommentForm({ reply, send, changePage }) {
 		}
 	};
 
-	const reply_mark = () => {
-		if (replyBlock) {
+	const reply_block = () => {
+		if (replyBlock && reply_to) {
 			return (
 				<div className="my-3">
 					<h5 className="mx-2">Reply to</h5>
@@ -100,15 +100,18 @@ function CommentForm({ reply, send, changePage }) {
 			);
 		}
 	};
+
 	const clearForm = () => {
-		setUsername('user');
-		setEmail('mail@mail.com');
-		setHomepage('http://website.com');
+		setUsername('');
+		setEmail('');
+		setHomepage(undefined);
 		setText('');
 		setFile(undefined);
+		setCaptcha('');
 		reply.setReplyTo(undefined);
 		setReplyBlock(undefined);
 	};
+
 	const handleSubmit = async (event) => {
 		event.preventDefault();
 		if (
@@ -133,7 +136,7 @@ function CommentForm({ reply, send, changePage }) {
 			},
 			homepage,
 			comment_text,
-			reply_to: reply_to,
+			replyToId: reply_to,
 		};
 		if (file) {
 			var reader = new FileReader();
@@ -158,7 +161,7 @@ function CommentForm({ reply, send, changePage }) {
 			{commentPreview()}
 			<div className="my-4">
 				<h4 className="my-5 mx-2">Comment</h4>
-				{reply_mark()}
+				{reply_block()}
 				<form onSubmit={handleSubmit}>
 					<div>
 						<div className="row my-2">
@@ -215,7 +218,17 @@ function CommentForm({ reply, send, changePage }) {
 							</div>
 
 							<div className="col mt-1">
-								<input type="text" className="form-control" id="captcha" placeholder="CAPTCHA" aria-label="CAPTCHA" value={captcha} onChange={(e) => setCaptcha(e.target.value)} required />
+								<input
+									type="text"
+									className="form-control"
+									id="captcha"
+									placeholder="CAPTCHA"
+									aria-label="CAPTCHA"
+									style={{ textTransform: 'uppercase' }}
+									value={captcha}
+									onChange={(e) => setCaptcha(e.target.value.toUpperCase())}
+									required
+								/>
 							</div>
 						</div>
 						<div className="mt-2 mb-3">{validationError(validationMessages?.file)}</div>

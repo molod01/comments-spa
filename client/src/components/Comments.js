@@ -95,6 +95,7 @@ function Comments({ reply, replyBlock, response, send, currentPageParent }) {
 			</div>
 		);
 	};
+
 	const renderImage = (image_data, id) => {
 		return (
 			<div className="mt-2">
@@ -104,6 +105,7 @@ function Comments({ reply, replyBlock, response, send, currentPageParent }) {
 			</div>
 		);
 	};
+
 	const renderComments = (comments, isChild) => {
 		if (comments) {
 			return comments.map((comment) => {
@@ -120,8 +122,8 @@ function Comments({ reply, replyBlock, response, send, currentPageParent }) {
 							<div className="w-100">
 								<div className="d-flex justify-content-between align-items-center">
 									<div className="d-flex flex-row align-items-center">
-										<span className="me-2">{comment.user.username}</span>
-										<small className="mail px-2 mt-1 mx-2 rounded-3 bg-primary text-white">{comment.user.email}</small>
+										<span className="me-2">{comment?.user?.username}</span>
+										<small className="mail px-2 mt-1 mx-2 rounded-3 bg-primary text-white">{comment?.user?.email}</small>
 									</div>
 									<small style={{ fontSize: 10 }}>{comment.date}</small>
 								</div>
@@ -158,6 +160,7 @@ function Comments({ reply, replyBlock, response, send, currentPageParent }) {
 				</div>
 			);
 	};
+	
 	return (
 		<div id="comments" className="mt-2">
 			{renderComments(comments)}

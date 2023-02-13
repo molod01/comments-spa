@@ -19,9 +19,11 @@ export default (sequalize) => {
 			homepage: DataTypes.STRING(128),
 		},
 		{
+			hierarchy: { as: 'replyTo', childrenAs: 'replies' },
 			tableName: 'comments',
 		}
 	);
 	Comment.beforeCreate((comment) => (comment.id = uuidv4()));
+
 	return Comment;
 };

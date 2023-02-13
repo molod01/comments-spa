@@ -10,7 +10,6 @@ export const useWs = ({ url }) => {
 		socket.onmessage = (event) => {
 			if (event.data) setResponse(event.data);
 		};
-
 		ws.current = socket;
 	}, [url]);
 

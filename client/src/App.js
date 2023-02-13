@@ -26,10 +26,7 @@ const App = () => {
 	useEffect(() => {}, [replyTo]);
 
 	useEffect(() => {
-		console.log('1');
 		if (send) {
-			console.log('clear');
-
 			clearResponse();
 			sendRequest('getPart', 0);
 			setCurrentPage(0);
