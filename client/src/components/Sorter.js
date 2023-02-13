@@ -4,7 +4,7 @@ function Sorter({ passSortBy }) {
 
 	useEffect(() => {
 		passSortBy(sortBy);
-	}, [sortBy]);
+	}, [passSortBy, sortBy]);
 
 	return (
 		<div className="form-floating mx-1">

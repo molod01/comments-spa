@@ -160,7 +160,7 @@ function Comments({ reply, replyBlock, response, send, currentPageParent }) {
 				</div>
 			);
 	};
-	
+
 	return (
 		<div id="comments" className="mt-2">
 			{renderComments(comments)}

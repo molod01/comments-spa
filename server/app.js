@@ -1,13 +1,16 @@
 import express from 'express';
-import http from 'http';
+import fs from 'fs';
+import https from 'https';
 import { WebSocketServer } from 'ws';
 import CommentController, { create, readAll } from './controllers/comment.controller.js';
 import db from './db/database.js';
 
 const PORT = process.env.PORT || 5000;
 const app = express();
+const key = fs.readFileSync('./config/key.pem');
+const cert = fs.readFileSync('./config/cert.pem');
+const server = https.createServer({ key, cert }, app);
 
-const server = http.createServer(app);
 app.set('port', PORT);
 
 const wss = new WebSocketServer({ server });
@@ -52,17 +55,5 @@ wss.on('connection', async (ws) => {
 
 server.listen(PORT, async () => {
 	await db.sequelize.sync({ force: false });
-	// const comment = {
-	// 	comment_text: 'eergregerg',
-	// 	file_link: null,
-	// 	homepage: '',
-	// 	parentId: null,
-	// 	user: {
-	// 		username: 'SSSS',
-	// 		email: 'EMAIL',
-	// 	},
-	// };
-	// await create(comment);
-	// console.log(await readAll());
-	console.log(`http://localhost:${PORT}`);
+	console.log(`wss://127.0.0.1:${PORT}/`);
 });

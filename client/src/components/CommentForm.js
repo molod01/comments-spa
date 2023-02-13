@@ -20,7 +20,7 @@ function CommentForm({ reply, send, changePage }) {
 
 	useEffect(() => {
 		loadCaptchaEnginge(6, '#f3f6f4', 'black', 'upper');
-	}, []);
+	}, [validationMessages]);
 
 	const formatDate = (date) => {
 		return date.replace('T', ' ').slice(0, -5);
@@ -107,6 +107,7 @@ function CommentForm({ reply, send, changePage }) {
 		setHomepage(undefined);
 		setText('');
 		setFile(undefined);
+		
 		setCaptcha('');
 		reply.setReplyTo(undefined);
 		setReplyBlock(undefined);

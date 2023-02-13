@@ -2,11 +2,15 @@ import { randomUUID } from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
-import { isTextFile } from '../../client/src/modules/file';
+const allowedExtensions = ['.jpeg', '.jpg', '.png', '.gif'];
 
-export const generateFileName = (name) => {
-	return 'files/' + randomUUID() + name.slice(name.lastIndexOf('.'));
-};
+export const generateFileName = (name) => 'files/' + randomUUID() + name.slice(name.lastIndexOf('.'));
+
+export const formatDate = (date) => date.replace('T', ' ').slice(0, -6);
+
+export const isImage = (filename) => allowedExtensions.includes(path.extname(filename));
+
+export const isText = (filename) => allowedExtensions.includes(path.extname(filename));
 
 export const resizeImage = async (path) => {
 	const newName = generateFileName(path);
@@ -31,15 +35,6 @@ export const saveFile = async (path, data) => {
 		console.log('The file was saved!');
 	});
 	return path;
-};
-
-export const formatDate = (date) => {
-	return date.replace('T', ' ').slice(0, -6);
-};
-
-export const isImage = (filename) => {
-	const allowedExtensions = ['.jpeg', '.jpg', '.png', '.gif'];
-	if (allowedExtensions.includes(path.extname(filename))) return true;
 };
 
 export const getImageAsDataURL = (filename) => {
