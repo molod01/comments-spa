@@ -10,7 +10,7 @@ export const formatDate = (date) => date.replace('T', ' ').slice(0, -6);
 
 export const isImage = (filename) => allowedExtensions.includes(path.extname(filename));
 
-export const isText = (filename) => allowedExtensions.includes(path.extname(filename));
+export const isText = (filename) => path.extname(filename) === '.txt';
 
 export const resizeImage = async (path) => {
 	const newName = generateFileName(path);
@@ -28,6 +28,9 @@ export const resizeImage = async (path) => {
 };
 
 export const saveFile = async (path, data) => {
+	if (!fs.existsSync('./files')) {
+		fs.mkdirSync('./files');
+	}
 	fs.writeFileSync(path, data, { encoding: 'binary' }, (err) => {
 		if (err) {
 			return console.log(err);
@@ -54,7 +57,7 @@ export const transformData = (comments) => {
 		if (comment.file_link) {
 			if (isImage(comment.file_link)) {
 				comment.dataValues.image_data = getImageAsDataURL(comment.file_link);
-			} else if (isTextFile(comment.file_link)) {
+			} else if (isText(comment.file_link)) {
 				comment.dataValues.text_data = readText(comment.file_link);
 			} else throw (err) => console.log(err);
 		}
@@ -64,4 +67,12 @@ export const transformData = (comments) => {
 		comments_transformed.push(comment);
 	}
 	return comments_transformed;
+};
+
+export const removeRedundant = (comments) => {
+	for (const comment of comments) {
+		delete comment.dataValues.hierarchyLevel;
+		delete comment.dataValues.UserId;
+		if (comment.replies) comment.replies = removeRedundant(comment.replies);
+	}
 };

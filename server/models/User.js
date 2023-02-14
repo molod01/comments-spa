@@ -22,6 +22,7 @@ export default (sequalize) => {
 		},
 		{
 			tableName: 'users',
+			updatedAt: false,
 		}
 	);
 	User.beforeCreate((user) => (user.id = uuidv4()));

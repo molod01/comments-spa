@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-
 import CommentForm from './components/CommentForm.js';
 import Comments from './components/Comments.js';
 import Sorter from './components/Sorter.js';

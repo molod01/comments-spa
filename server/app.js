@@ -1,53 +1,28 @@
+import * as dotenv from 'dotenv';
 import express from 'express';
 import fs from 'fs';
 import https from 'https';
 import { WebSocketServer } from 'ws';
-import CommentController, { create, readAll } from './controllers/comment.controller.js';
 import db from './db/database.js';
+import { messageProcessing, sendPart } from './middleware/webSocketServer.js';
 
-const PORT = process.env.PORT || 5000;
+dotenv.config();
+
+const PORT = process.env.NODE_DOCKER_PORT || 6868;
+
 const app = express();
+
 const key = fs.readFileSync('./config/key.pem');
 const cert = fs.readFileSync('./config/cert.pem');
+
 const server = https.createServer({ key, cert }, app);
 
-app.set('port', PORT);
-
 const wss = new WebSocketServer({ server });
-
-const newComment = async (comment) => {
-	await CommentController.create(comment);
-};
-
-const sendPart = async (client, partIndex, sortBy) => {
-	if (!partIndex) partIndex = 0;
-	client.curentPart = partIndex;
-	client.currentSort = sortBy;
-	const [part, pagesCount] = await CommentController.getPart(partIndex, sortBy);
-	client.send(JSON.stringify({ data: part, pagesCount }));
-};
-
-const updateClients = async () => {
-	wss.clients.forEach(async (client) => {
-		await sendPart(client, client.curentPart, client.currentSort);
-	});
-};
-
-const dispatchMessage = async (message, ws) => {
-	const json = JSON.parse(message);
-	switch (json.event) {
-		case 'postComment':
-			await newComment(json.payload);
-			await updateClients();
-		case 'getPart':
-			await sendPart(ws, json.payload.part, json.payload.sortBy);
-	}
-};
 
 wss.on('connection', async (ws) => {
 	await sendPart(ws, 0);
 	ws.on('message', (m) => {
-		dispatchMessage(m, ws);
+		messageProcessing(m, wss, ws);
 	});
 	ws.on('error', (e) => ws.send(e));
 	ws.on('close', () => console.log('close'));
@@ -55,5 +30,5 @@ wss.on('connection', async (ws) => {
 
 server.listen(PORT, async () => {
 	await db.sequelize.sync({ force: false });
-	console.log(`wss://127.0.0.1:${PORT}/`);
+	console.log(`Server run on port: ${PORT}`);
 });

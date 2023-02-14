@@ -138,6 +138,7 @@ function Comments({ reply, replyBlock, response, send, currentPageParent }) {
 										onClick={(e) => {
 											reply(e.currentTarget.id);
 											generateReply(e.currentTarget.id);
+											window.scrollTo(0, 0);
 										}}
 										className="reply"
 										id={comment.id}
@@ -151,7 +152,7 @@ function Comments({ reply, replyBlock, response, send, currentPageParent }) {
 					</>
 				);
 			});
-		} else
+		} else if (pagesCount !== 0)
 			return (
 				<div className="d-flex justify-content-center my-5">
 					<div className="spinner-border" role="status">

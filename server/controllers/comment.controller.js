@@ -64,7 +64,6 @@ export const updateById = async (id) => {
 		});
 };
 
-
 export const deleteById = async (id) => {
 	await Comment.destroy({
 		where: {
@@ -83,7 +82,7 @@ export const getCount = async () => {
 
 export const getPart = async (partIndex, sortBy = 'createdAt_desc') => {
 	return readAll(sortBy).then((comments) => {
-		const commentsOnPage = parseInt(process.env.COMMENTS_ON_PAGE);
+		const commentsOnPage = parseInt(process.env.COMMENTS_ON_PAGE) || 25;
 		if (comments) {
 			const pagesCount = Math.ceil(comments.length / commentsOnPage);
 			const startIndex = partIndex * commentsOnPage;

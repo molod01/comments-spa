@@ -21,6 +21,7 @@ export default (sequalize) => {
 		{
 			hierarchy: { as: 'replyTo', childrenAs: 'replies' },
 			tableName: 'comments',
+			updatedAt: false,
 		}
 	);
 	Comment.beforeCreate((comment) => (comment.id = uuidv4()));

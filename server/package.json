@@ -1,0 +1,27 @@
+{
+	"name": "spa-comments",
+	"version": "1.0.0",
+	"description": "",
+	"main": "app.js",
+	"type": "module",
+	"scripts": {
+		"start": "node app",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "Mykyta Manuilov",
+	"license": "ISC",
+	"dependencies": {
+		"body-parser": "^1.20.1",
+		"dotenv": "^16.0.3",
+		"ejs-mate": "^4.0.0",
+		"express": "^4.18.2",
+		"mysql2": "^3.1.0",
+		"resize-image": "^0.1.0",
+		"sequelize": "^6.28.0",
+		"sequelize-hierarchy": "^2.0.4",
+		"sequelize-hierarchy-next": "^1.0.0",
+		"sharp": "^0.31.3",
+		"uuid": "^9.0.0",
+		"ws": "^8.12.0"
+	}
+}

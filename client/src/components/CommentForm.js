@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { LoadCanvasTemplate, loadCaptchaEnginge } from 'react-simple-captcha';
 import { validateForm } from '../modules/validations.js';
 
@@ -20,6 +20,7 @@ function CommentForm({ reply, send, changePage }) {
 
 	useEffect(() => {
 		loadCaptchaEnginge(6, '#f3f6f4', 'black', 'upper');
+		setCaptcha('');
 	}, [validationMessages]);
 
 	const formatDate = (date) => {
@@ -107,10 +108,10 @@ function CommentForm({ reply, send, changePage }) {
 		setHomepage(undefined);
 		setText('');
 		setFile(undefined);
-		
 		setCaptcha('');
 		reply.setReplyTo(undefined);
 		setReplyBlock(undefined);
+		document.getElementById('file').value = null;
 	};
 
 	const handleSubmit = async (event) => {
@@ -234,7 +235,16 @@ function CommentForm({ reply, send, changePage }) {
 						</div>
 						<div className="mt-2 mb-3">{validationError(validationMessages?.file)}</div>
 						<div className="mt-2 mb-3">
-							<input type="file" className="form-control" id="file" placeholder="File" aria-label="File" onChange={(e) => setFile(e.target.files[0])} />
+							<input
+								type="file"
+								className="form-control"
+								id="file"
+								placeholder="File"
+								aria-label="File"
+								onChange={(e) => {
+									setFile(e.target.files[0]);
+								}}
+							/>
 						</div>
 						{previewButton()}
 						<button type="submit" className="btn btn-outline-dark mt-3 w-100">
