@@ -2,7 +2,7 @@ import { validateCaptcha } from 'react-simple-captcha';
 import { isTextFile, isValidFileImageSize, isValidFileTextSize, isValidFileType } from './file.js';
 
 export const validationMessages = {
-	username: 'Username must be 4-20 characters long',
+	username: 'Username must be 4-20 characters long without whitespaces or illegal signs',
 	email: 'Email is not valid',
 	homepage: 'Url is not valid',
 	comment_text: {
@@ -21,7 +21,7 @@ export const validationMessages = {
 	},
 };
 export const validations = {
-	username: /^(?=[a-zA-Z0-9._]{4,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/,
+	username: /^(?=[а-яА-Яa-zA-Z0-9._]{4,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/,
 	email: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
 	homepage: /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi,
 	comment_text: {
